@@ -9,7 +9,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.xml.sax.SAXParseException
 
-import scala.xml.{Node, XML}
+import scala.xml.{Elem, Node, XML}
 
 /**
   * Created by admin on 2016/9/10.
@@ -31,8 +31,18 @@ object PoiService {
 
   def getPoiString(poiLine: RDD[String]): RDD[String] = {
 
-    try {
+    val poiRdd: RDD[Poi] = getPoiRdd(poiLine)
+    val poi = poiRdd.map(x => Array(x.name, x.dataId, x
+      .point, x
+      .city,
+      x.category, x.subCategory,
+      x.brand, x.keyword, x.commentNum, x.price, x.grade, x.guid).mkString("\t"))
+    return poi
 
+  }
+
+  def getPoiRdd(poiLine: RDD[String]): RDD[Poi] ={
+    try {
       val line: RDD[Node] = poiLine.flatMap { s =>
         try {
           XML.loadString(s)
@@ -43,20 +53,18 @@ object PoiService {
           }
         }
       }
-      val poi = line
-        .map(x => parsePoi(x)).map(x => Array(x.name, x.dataId, x
-        .point, x
-        .city,
-        x.category, x.subCategory,
-        x.brand, x.keyword, x.commentNum, x.price, x.grade, x.guid).mkString("\t"))
-      return poi
-    } catch {
+      val poiRdd: RDD[Poi] = line.map(x => parsePoi(x))
+      return poiRdd
+
+    }catch {
       case ex: Exception => {
       }
     }
     return null
 
   }
+
+
 
   def parsePoi(x: Node): Poi = {
     val poi = new Poi
@@ -78,6 +86,11 @@ object PoiService {
     poi.keyword = x.\("KEYWORDS").text + x.\("TAG").text
     poi.province = x.\("SRC_PROVINCE").text
     poi.brand = getBrand(poi.keyword)
+    poi.geometry = x.\("GEOMETRY").text
+    poi.alias = x.\("SRC_ALIAS").text
+
+    poi.introduction = x.\("INTRODUCTION").text
+
 
     val deepStr = x.\\("DEEP").text
     if (!deepStr.isEmpty) {
@@ -86,7 +99,7 @@ object PoiService {
 
         val deep = "<root>" + deepStr + "</root>"
 
-        val deepXml = XML.loadString(deep)
+        val deepXml: Elem = XML.loadString(deep)
 
 
         val items = deepXml \ "additional" \ "data" \ "items" \ "item"

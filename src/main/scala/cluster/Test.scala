@@ -1,6 +1,7 @@
 package cluster
 
 import breeze.linalg.{*, DenseMatrix, DenseVector}
+import breeze.numerics.{log10, log}
 import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg._
 import org.apache.spark.rdd.RDD
@@ -27,11 +28,10 @@ object Test {
     val weightPath = "D:\\structure\\featurePoi\\poi-weight.txt"
 
 
-    val weightLine = sc.textFile(weightPath).cache()
+    val weightLine : RDD[String] = sc.textFile(weightPath).cache()
 
 
-
-    val weightFeatureVectors: RDD[Array[String]] = weightLine.map(weightLine => weightLine.split('\t')).cache()
+    val weightFeatureVectors: RDD[Array[String]] = weightLine.map(weightLine => weightLine.split("\t")).cache()
 
 
     var weightArray: Array[Array[String]] = weightFeatureVectors.collect()
@@ -55,20 +55,20 @@ object Test {
     //    println(sss)
 
 
-    //    val line = sc.textFile(path).map(x => new String(x.getBytes, 0, x.length, "GB18030")).map(line =>line.split('\t')
+    //    val line = sc.textFile(path).map(x => new String(x.getBytes, 0, x.length, "GB18030")).map(line =>line.split("\t")
     //      .slice(6,line.length))
 
 
     val line = sc.textFile(path).cache()
 
 
-    val resultfeature = line.map(line => Vectors.dense(line.split('\t').slice(6, line.length)
+    val resultfeature = line.map(line => Vectors.dense(line.split("\t").slice(6, line.length)
       .map(_
       .toDouble)))
       .cache()
 
 
-    val featureVectors1: RDD[DenseMatrix[Double]] = line.map(line => DenseMatrix(line.split('\t').slice(6, line
+    val featureVectors1: RDD[DenseMatrix[Double]] = line.map(line => DenseMatrix(line.split("\t").slice(6, line
       .length).map(_.toDouble)))
       .cache()
 
@@ -104,10 +104,10 @@ object Test {
 
     //    var resu = weightFeatureVectors*featureVectors1
 
-    //    val test= line.map(line =>line.split('\t').slice(6,line.length))
+    //    val test= line.map(line =>line.split("\t").slice(6,line.length))
 
 
-    //    val featureVectors =line.map (line => Vectors.dense(line.split('\t').slice(6,line.length).map(_.toDouble))).cache()
+    //    val featureVectors =line.map (line => Vectors.dense(line.split("\t").slice(6,line.length).map(_.toDouble))).cache()
 
     //    val featureVectors: RDD[Vector] = sc.parallelize(Seq(resu))
 
@@ -213,7 +213,7 @@ object Test {
     )
 
 
-    val clusterResult = line.map(line => line.toString + "\t" + rowRank.get(model.predict(Vectors.dense(line.split('\t')
+    val clusterResult = line.map(line => line.toString + "\t" + rowRank.get(model.predict(Vectors.dense(line.split("\t")
       .slice
       (6, line.length).map(_.toDouble)))).get)
 

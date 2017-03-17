@@ -3,7 +3,7 @@ package cluster.model
 /**
   * Created by admin on 2016/9/15.
   */
-class CellCut extends java.io.Serializable{
+class CellCut extends Serializable{
   private[model] var DIAMETER: Double = .0
   private[model] var EXPAND: Double = .0
 
@@ -20,7 +20,7 @@ class CellCut extends java.io.Serializable{
     val ax: Int = x.toInt
     y = y / DIAMETER
     val ay: Int = y.toInt
-    return ax + "|" + ay
+    return (ax + "|" + ay)
   }
 
   def getCrossCell(xl: Double, xh: Double, yl: Double, yh: Double): List[String] = {
@@ -38,7 +38,7 @@ class CellCut extends java.io.Serializable{
 
     for (i<- axl to axh){
       for (j<- ayl to ayh){
-        val temp: String = i + "|" + j
+        val temp = (i + "|" + j)
         if (!outList.contains(temp)) outList ::= temp
       }
     }

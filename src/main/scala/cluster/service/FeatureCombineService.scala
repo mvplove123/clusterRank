@@ -22,7 +22,7 @@ object FeatureCombineService {
     ).map(line => (line(0), Array("searchCount_" + line(5), line(6), line(7)).mkString("\t"))) //dataid,hitCount,viewCount,sumViewOrder
 
     val hotCount = poiHotCountRdd.map(line => line.split('\t')
-    ).map(line => (line(0),"hotCount_" + line(2))) //dataid,hotCount
+    ).map(line => (line(0),"hotCount_" + line(1))) //dataid,hotCount
 
     val structureInfo = structureRdd.map(line => line.split('\t')
     ).filter(x=>x.length==12).map(line => (line(0), Array("structure_" + line(5), line(6), line(7), line(8), line(9),
@@ -45,7 +45,7 @@ object FeatureCombineService {
     )
 
     val combineRdd: RDD[String] = combineFeatures.map(x => featureCombineInfo(x._2)).filter(x=>StringUtils.isNotBlank
-    (x)).cache()
+    (x))
 
     return combineRdd
 

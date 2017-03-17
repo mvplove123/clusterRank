@@ -11,7 +11,7 @@ class RDDMultipleTextOutputFormat extends GBKMultipleTextOutputFormat[Any, Any] 
     NullWritable.get()
 
   override def generateFileNameForKeyValue(key: Any, value: Any, name: String): String =
+//    key.asInstanceOf[String]
     key.asInstanceOf[String]
-
 
 }
